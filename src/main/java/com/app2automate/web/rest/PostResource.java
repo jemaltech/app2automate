@@ -3,6 +3,7 @@ package com.app2automate.web.rest;
 import com.app2automate.domain.Post;
 import com.app2automate.repository.PostRepository;
 import com.app2automate.repository.search.PostSearchRepository;
+import com.app2automate.security.SecurityUtils;
 import com.app2automate.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -108,9 +109,13 @@ public class PostResource {
         log.debug("REST request to get a page of Posts");
         Page<Post> page;
         if (eagerload) {
-            page = postRepository.findAllWithEagerRelationships(pageable);
+            //page = postRepository.findAllWithEagerRelationships(pageable);
+            page = postRepository.findByBlogUserLoginOrderByDateDesc(
+                SecurityUtils.getCurrentUserLogin().orElse(null), pageable);
         } else {
-            page = postRepository.findAll(pageable);
+            //page = postRepository.findAll(pageable);
+            page = postRepository.findByBlogUserLoginOrderByDateDesc(
+                SecurityUtils.getCurrentUserLogin().orElse(null), pageable);
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
